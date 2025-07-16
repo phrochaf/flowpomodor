@@ -1,0 +1,42 @@
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flow Pomodor Analytics</title>
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter...>" rel="stylesheet">
+
+    <!-- React & Babel... -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    ...
+</head>
+<body class="bg-gray-900 text-white">
+    <div id="root"></div>
+
+    <script type="text/babel" data-type="module">
+        // Main App Component
+        function App() {
+            const [user, setUser] = useState(null);
+            const [loading, setLoading] = useState(true);
+            // ... more code ...
+
+            if (loading) {
+                return <div>Loading...</div>;
+            }
+
+            if (!user) {
+                return <LoginScreen ... />;
+            }
+            
+            return (
+                // The main app view for a logged-in user
+            );
+        }
+    </script>
+</body>
