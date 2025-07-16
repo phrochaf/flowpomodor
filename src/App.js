@@ -1,32 +1,28 @@
 // client/src/App.js
 
 import React, { useState, useEffect } from 'react';
+import Header from './Header';
+import TimerView from './TimerView';
 import './App.css';
 
 function App() {
-  // 1. Create a state variable to hold the message from the server.
-  // It starts as an empty string.
-  const [message, setMessage] = useState('');
 
-  // 2. Use useEffect to run code once when the component loads.
-  // The empty array [] at the end means "only run this once".
+  const[user, setUser] = useState({null});
+  const[view, setView] = useState('timer');
+
   useEffect(() => {
-    // 3. Use the built-in 'fetch' function to make a request to our server's URL.
-    fetch('http://localhost:5001/api/test')
-      .then(res => res.json()) // Take the response and turn it into JSON
-      .then(data => setMessage(data.message)); // Take the JSON data and set our message state
+    // TODO: Add Firebase onAuthStateChanged listener
   }, []);
 
   return (
     <div className="App">
-      <header className="App-header">
-        <h1>FlowPomodor</h1>
-        {/* 4. Display the message from our state. It will be empty at first,
-            then it will update once the data arrives from the server. */}
-        <p>{message}</p>
-      </header>
+      <Header user={user} setView={setView} />
+      <main>
+        {/* View state to choose the component to render */}
+        {view === 'timer' && <TimerView user={user} />}
+        {user && view ==='dashboard' && <div>Dashboard (soon...)</div>}
+        {user && view ==='settings' && <div>Settings (soon...)</div>}
+      </main>
     </div>
   );
-}
-
-export default App;
+} export default App;
