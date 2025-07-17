@@ -7,27 +7,42 @@ function TimerView({ user }) {
   const [timerMode, setTimerMode] = useState('focus'); 
   const [time, setTime] = useState(25 * 60);
   const [isActive, setIsActive] = useState(false);
+  const [isFlowMode, setIsFlowMode] = useState(false);
+
   
   const intervalRef = useRef(null);
 
-  // --- EFFECT ---
+  // --- EFFECT with CORRECTED Flow Mode Logic ---
   useEffect(() => {
     if (isActive) {
       intervalRef.current = setInterval(() => {
         setTime(prevTime => {
-          if (prevTime >= 1) {
-            return prevTime - 1;
+          // If we are already in Flow Mode, just count up.
+          if (isFlowMode) {
+            return prevTime + 1;
           }
-          // When time hits 0, reset the timer for now.
-          handleReset(); 
-          return 0;
+
+          // THE FIX: Check if this is the final tick of the countdown.
+          if (prevTime === 1) {
+            // If it is, decide what to do next...
+            if (timerMode === 'focus') {
+              setIsFlowMode(true); // Enter Flow Mode immediately
+            } else {
+              handleReset(); // Or reset if it was a break
+            }
+            return 0; // And set the clock to 0.
+          }
+          
+          // Otherwise, just keep counting down normally.
+          return prevTime - 1;
         });
       }, 1000);
     } else {
       clearInterval(intervalRef.current);
     }
+
     return () => clearInterval(intervalRef.current);
-  }, [isActive]);
+  }, [isActive, isFlowMode, timerMode]);
 
 
   // --- HANDLER FUNCTIONS ---
@@ -46,6 +61,12 @@ function TimerView({ user }) {
     // We call your new switchMode function to make sure the reset
     // goes to the correct time for the current mode.
     switchMode(timerMode); 
+  };
+
+  const handleSetTestTime = () => {
+    setIsActive(false);
+    setIsFlowMode(false);
+    setTime(3);
   };
   
   // Your switchMode function!
@@ -76,6 +97,7 @@ function TimerView({ user }) {
         <button onClick={() => switchMode('focus')}>Focus</button>
         <button onClick={() => switchMode('shortBreak')} style={{ marginLeft: '10px' }}>Short Break</button>
         <button onClick={() => switchMode('longBreak')} style={{ marginLeft: '10px' }}>Long Break</button>
+        <button onClick={handleSetTestTime} style={{ marginLeft: '10px' }}>3s Test Time</button>
       </div>
 
       <div style={{ fontSize: '4rem', margin: '20px' }}>
