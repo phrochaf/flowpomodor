@@ -62,6 +62,7 @@ function TimerView({ user }) {
   const mainButtonBaseClasses = 'px-16 py-4 rounded-lg text-white text-xl font-bold uppercase tracking-wider shadow-lg transition-all transform hover:scale-105';
 
   return (
+    <>
     <div className="bg-gray-800 text-white shadow-2xl p-8 w-full max-w-md mx-auto rounded-2xl flex flex-col items-center">
       
       {/* Mode buttons now use blue instead of indigo */}
@@ -111,7 +112,17 @@ function TimerView({ user }) {
       </button>
 
       {isFlowMode && <p className="text-green-400 mt-8 font-semibold">You're in the flow! Keep going!</p>}
+
     </div>
+    <div className="w-full max-w-md mx-auto mt-8">
+      <button className='flex items-center justify-center w-16 h-16 border-2 border-dashed border-gray-600 rounded-full text-gray-600 hover:border-gray-500 hover:text-gray-500 transition-colors' onClick={handleOpenModal}><svg className="w-8 h-8" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+
+      </svg></button>
+    </div>
+    </>
+
   );
 }
 
