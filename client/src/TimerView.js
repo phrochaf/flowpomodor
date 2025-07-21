@@ -1,6 +1,56 @@
 // client/src/TimerView.js
 
 import React, { useState, useEffect, useRef } from 'react';
+import { doc, setDoc, onSnapshot } from 'firebase/firestore';
+import { auth, db } from './firebase';
+
+function AddCategoryModal ({onClose, user, existingCategories}) {
+  const [categoryName, setCategoryName] = useState('');
+  const [categoryColor, setCategoryColor] = useState ('#4ade80');
+
+  const handleSave = async() => {
+    if (!categoryName || !user) {
+      return;
+    }
+    
+    const newCategory = {name:categoryName, color:categoryColor};
+    const updatedCategories = [...existingCategories, newCategory];
+
+    try {
+      const userDocRef = doc(db, 'users', user.uid);
+      
+      await setDoc(userDocRef, {catergories:updatedCategories});
+    } catch(error) {
+      console.error("Error saving category:", error);
+  }
+    
+      console.log("Saving:", {name:categoryName, color: categoryColor});
+    onClose();
+}
+  
+
+  return (
+    <div className='fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center'>
+      <div className='bg-gray-800 text-white shadow-xl p-8 w-full max-w-sm rounded-lg'>
+      <h2 className='text-2xl font-bold mb-6'>Create New Category</h2>
+      <div className='mb-4'>
+        <div className='mb-6'>
+          <label className='block text-sm font-medium text-gray-400 mb-1' htmlFor='categoryName'>Category Name</label>
+          <input className='w-full bg-gray-700 text-white px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500' type='text' id='categoryName' value={categoryName} onChange={(e)=>{setCategoryName(e.target.value)}}></input>
+        </div>
+        <div className='mb-6'>
+          <label className='block text-sm font-medium text-gray-400 mb-1' htmlFor='categoryColor'>Category Color</label>
+          <input className='w-full bg-gray-700 h-12 p-1 rounded-md cursor-pointer' type='color' id='categoryColor' value={categoryColor} onChange={(e)=>{setCategoryColor(e.target.value)}}></input>
+        </div>
+      </div>
+      <div className='flex justify-end gap-4'>
+      <button className='px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-md transition-colors' onClick={handleSave} >Save</button>
+      <button className='px-4 py-2 bg-gray-600 hover:bg-gray-500 rounded-md transition-colors' onClick={onClose}>Cancel</button>
+      </div>
+      </div>
+      </div>
+  )
+}
 
 function TimerView({ user }) {
   const [timerMode, setTimerMode] = useState('focus'); 
@@ -8,6 +58,7 @@ function TimerView({ user }) {
   const [isActive, setIsActive] = useState(false);
   const [isFlowMode, setIsFlowMode] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [categories, setCategories] = useState([]);
   
   const intervalRef = useRef(null);
 
@@ -121,6 +172,7 @@ function TimerView({ user }) {
 
       </svg></button>
     </div>
+    {isModalOpen && <AddCategoryModal onClose={handleCloseModal}/>}
     </>
 
   );
