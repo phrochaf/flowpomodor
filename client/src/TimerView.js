@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { doc, setDoc, onSnapshot } from 'firebase/firestore';
 import { auth, db } from './firebase';
+import { CirclePicker } from 'react-color';
 
 function AddCategoryModal ({onClose, user, existingCategories}) {
   const [categoryName, setCategoryName] = useState('');
@@ -19,15 +20,18 @@ function AddCategoryModal ({onClose, user, existingCategories}) {
     try {
       const userDocRef = doc(db, 'users', user.uid);
       
-      await setDoc(userDocRef, {catergories:updatedCategories});
+      await setDoc(userDocRef, {categories:updatedCategories}, {merge:true});
+      onClose();
     } catch(error) {
       console.error("Error saving category:", error);
   }
     
       console.log("Saving:", {name:categoryName, color: categoryColor});
-    onClose();
+
 }
-  
+  const handleColorChange = (color) => {
+    setCategoryColor(color.hex);
+  }
 
   return (
     <div className='fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center'>
@@ -40,7 +44,7 @@ function AddCategoryModal ({onClose, user, existingCategories}) {
         </div>
         <div className='mb-6'>
           <label className='block text-sm font-medium text-gray-400 mb-1' htmlFor='categoryColor'>Category Color</label>
-          <input className='w-full bg-gray-700 h-12 p-1 rounded-md cursor-pointer' type='color' id='categoryColor' value={categoryColor} onChange={(e)=>{setCategoryColor(e.target.value)}}></input>
+          <CirclePicker color={categoryColor} onChangeComplete={handleColorChange}/>
         </div>
       </div>
       <div className='flex justify-end gap-4'>
@@ -59,6 +63,10 @@ function TimerView({ user }) {
   const [isFlowMode, setIsFlowMode] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [categories, setCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [sessionStartTime, setSessionStartTime] = useState(null);
+  const [sessionEndTime, setSessionEndTime] = useState(null);
+  
   
   const intervalRef = useRef(null);
 
@@ -82,6 +90,25 @@ function TimerView({ user }) {
     return () => clearInterval(intervalRef.current);
   }, [isActive, isFlowMode, timerMode]);
 
+  useEffect(() => {
+    if(!user) {
+      setCategories([]);
+      return;
+    }
+
+    const userDocRef = doc(db, 'users', user.uid);
+
+    const unsubscribe = onSnapshot(userDocRef, (docSnap) => {
+      if (docSnap.exists() && docSnap.data().categories) {
+        setCategories(docSnap.data().categories);
+      } else {
+        setCategories([]);
+      }
+    });
+
+    return unsubscribe;
+  },  [user]);
+
   const handleStart = () => { if (time > 0 || timerMode === 'focus') { setIsActive(true); } };
   const handlePause = () => { setIsActive(false); };
   const handleReset = () => {
@@ -91,6 +118,14 @@ function TimerView({ user }) {
   };
   const handleOpenModal = () => {setIsModalOpen(true)};
   const handleCloseModal = () => {setIsModalOpen(false)};
+  const handleSelectCategory = (category) => {
+    if (selectedCategory?.name === category.name) {
+      setSelectedCategory(null);
+    } else {
+      setSelectedCategory(category);
+    }
+  }
+  
 
 
 
@@ -165,14 +200,38 @@ function TimerView({ user }) {
       {isFlowMode && <p className="text-green-400 mt-8 font-semibold">You're in the flow! Keep going!</p>}
 
     </div>
-    <div className="w-full max-w-md mx-auto mt-8">
-      <button className='flex items-center justify-center w-16 h-16 border-2 border-dashed border-gray-600 rounded-full text-gray-600 hover:border-gray-500 hover:text-gray-500 transition-colors' onClick={handleOpenModal}><svg className="w-8 h-8" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
 
-      <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
 
-      </svg></button>
+  {/* The Focus Shelf */}
+  <div className="w-full max-w-md mx-auto mt-8 p-4 bg-gray-800 rounded-lg shadow-lg">
+    
+
+    <div className="flex items-start gap-4 justify-center ">
+      {categories.map((category) => (
+        <div key={category.name} className={`flex flex-col items-center gap-2 w-20 ${selectedCategory?.name === category.name ? 'ring-2 ring-blue-500 rounded-lg' : ''}`}>
+          <button onClick={() => handleSelectCategory(category)} 
+            className='w-8 h-8 m-2 rounded-full shadow-md transition-all hover:scale-110 hover:shadow-lg' 
+            style={{
+              backgroundColor: category.color, 
+              boxShadow: `0 0 10px ${category.color}`
+            }}
+          ></button>
+          <span className='text-gray-300 text-sm text-center'>{category.name}</span>
+        </div>
+      ))}
     </div>
-    {isModalOpen && <AddCategoryModal onClose={handleCloseModal}/>}
+
+
+    <div className='flex justify-center mt-4'>
+      <button className='flex items-center justify-center w-10 h-10 border-2 border-dashed border-gray-600 rounded-full text-gray-600 hover:border-gray-500 hover:text-gray-500 transition-colors' onClick={handleOpenModal}>
+        <svg className="w-8 h-8" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+        </svg>
+      </button>
+    </div>
+
+</div>
+    {isModalOpen && <AddCategoryModal onClose={handleCloseModal} user={user} existingCategories={categories}/>}
     </>
 
   );
