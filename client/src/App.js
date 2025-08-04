@@ -5,6 +5,8 @@ import { auth, googleProvider } from './firebase';
 import { onAuthStateChanged, signInWithPopup, signOut } from 'firebase/auth';
 import Header from './Header';
 import TimerView from './TimerView';
+import DashboardView from './DashboardView';
+import SettingsView from './SettingsView';
 import './App.css';
 
 function App() {
@@ -58,8 +60,10 @@ function App() {
         onLogout={handleLogout}
       />
       
-      <main>
-        <TimerView user={user} />
+      <main className='w-full'>
+        {view === 'timer' && <TimerView user={user} />} 
+        {view === 'dashboard' && <DashboardView user={user} />}
+        {view === 'settings' && <SettingsView user={user} />}
         {/* We'll add the other views later */}
       </main>
     </div>
