@@ -157,7 +157,7 @@ function App() {
         <main className='w-full'>
           {view === 'timer' && <TimerView user={user} categories={categories} />} 
           {view === 'dashboard' && <DashboardView user={user} categories={categories} />}
-          {view === 'settings' && <SettingsView user={user} />}
+          {view === 'settings' && <SettingsView user={user} categories={categories} />}
           {/* We'll add the other views later */}
         </main>
       </div>

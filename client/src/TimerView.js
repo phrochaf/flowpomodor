@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { CirclePicker } from 'react-color';
 import { auth, db } from './firebase';
 import { doc, setDoc, onSnapshot, collection, addDoc } from "firebase/firestore";
+import TallyMarks from './TallyMarks';
 
 // The AddCategoryModal component remains the same...
 function AddCategoryModal({ onClose, user, existingCategories }) {
@@ -171,10 +172,13 @@ function TimerView({ user, categories }) {
     return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
   };
 
+  
+
   const mainButtonBaseClasses = 'px-16 py-4 rounded-lg text-white text-xl font-bold uppercase tracking-wider shadow-lg transition-all transform hover:scale-105';
 
   return (
     <>
+      <TallyMarks elapsedTime={elapsedTime} />
       {/* The Main Timer Card */}
       <div className="bg-gray-800 text-white shadow-2xl p-8 w-full max-w-md mx-auto rounded-2xl flex flex-col items-center">
         <div className="bg-gray-900 p-1 rounded-full flex items-center gap-2 mb-8">
