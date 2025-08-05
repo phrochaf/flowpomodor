@@ -49,14 +49,13 @@ function AddCategoryModal({ onClose, user, existingCategories }) {
 }
 
 
-function TimerView({ user }) {
+function TimerView({ user, categories }) {
   // --- STATE ---
   const [timerMode, setTimerMode] = useState('focus'); 
   const [time, setTime] = useState(25 * 60);
   const [isActive, setIsActive] = useState(false);
   const [isFlowMode, setIsFlowMode] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [elapsedTime, setElapsedTime] = useState(0); // Our new accurate stopwatch
   const [currentPage, setCurrentPage] = useState(0);
@@ -88,23 +87,6 @@ function TimerView({ user }) {
     }
     return () => clearInterval(intervalRef.current);
   }, [isActive, isFlowMode, timerMode]);
-
-  // Effect to listen for category changes in Firebase
-  useEffect(() => {
-    if (!user) {
-      setCategories([]);
-      return;
-    }
-    const userDocRef = doc(db, 'users', user.uid);
-    const unsubscribe = onSnapshot(userDocRef, (docSnap) => {
-      if (docSnap.exists() && docSnap.data().categories) {
-        setCategories(docSnap.data().categories);
-      } else {
-        setCategories([]);
-      }
-    });
-    return unsubscribe;
-  }, [user]);
 
   // --- HANDLERS ---
   const handleOpenModal = () => { setIsModalOpen(true); };

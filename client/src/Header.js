@@ -6,7 +6,7 @@ function Header({ user, setView, onLogin, onLogout }) {
   const secondaryButtonClassName = 'px-3 py-1 text-sm font-semibold rounded-full text-gray-300 hover:bg-gray-700 transition-colors';
 
   return (
-    <header className="grid grid-cols-3 items-center w-full pb-4 border-b border-gray-600">
+    <header className="grid grid-cols-[1fr_auto_1fr] items-center w-full pb-4 border-b border-gray-600">
       
       {/* Column 1: Title and Icon */}
       <div className="justify-self-start flex items-center">
