@@ -15,6 +15,7 @@ function DashboardView({ user, categories }) {
 
   // Ensure categories is always an array
   const safeCategories = Array.isArray(categories) ? categories : [];
+  const isProUser = false;
 
   useEffect(() => {
     if (!user) {
@@ -55,6 +56,9 @@ function DashboardView({ user, categories }) {
 
   // --- Filtering Logic ---
   const filteredSessions = sessions.filter(session => {
+    if (!isProUser) {
+      return true;
+    }
     if (!session || !session.timestamp) return false;
     
     if (timeFilter === 'all') return true;
@@ -141,12 +145,21 @@ function DashboardView({ user, categories }) {
             </svg></button>
         </div>
         {/* Your time filter buttons */}
+        {isProUser ? (
         <div className="flex gap-2">
-        <button className={`px-3 py-1 text-sm rounded-md ${timeFilter === 'all' ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-400'}`} onClick={() => setTimeFilter('all')}>All Time</button>
-          <button className={`px-3 py-1 text-sm rounded-md ${timeFilter === 'day' ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-400'}`} onClick={() => setTimeFilter('day')}>Day</button>
-          <button className={`px-3 py-1 text-sm rounded-md ${timeFilter === 'week' ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-400'}`} onClick={() => setTimeFilter('week')}>Week</button>
-          <button className={`px-3 py-1 text-sm rounded-md ${timeFilter === 'month' ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-400'}`} onClick={() => setTimeFilter('month')}>Month</button>
+            <button className={`px-3 py-1 text-sm rounded-md ${timeFilter === 'all' ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-400'}`} onClick={() => setTimeFilter('all')}>All Time</button>
+            <button className={`px-3 py-1 text-sm rounded-md ${timeFilter === 'day' ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-400'}`} onClick={() => setTimeFilter('day')}>Day</button>
+            <button className={`px-3 py-1 text-sm rounded-md ${timeFilter === 'week' ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-400'}`} onClick={() => setTimeFilter('week')}>Week</button>
+            <button className={`px-3 py-1 text-sm rounded-md ${timeFilter === 'month' ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-400'}`} onClick={() => setTimeFilter('month')}>Month</button>
         </div>
+        ) : (
+        <div className="flex items-center gap-4">
+            <p className="text-sm text-gray-400">Filter by day, week or month with Pro!</p>
+            <button className="px-3 py-1 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-500 rounded-md">
+            Upgrade Now
+            </button>
+        </div>
+        )}
       </div>
       
       {sessions.length > 0 && chartData.length > 0 ? (

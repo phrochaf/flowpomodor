@@ -7,7 +7,7 @@ import { doc, setDoc, onSnapshot, collection, addDoc } from "firebase/firestore"
 import TallyMarks from './TallyMarks';
 
 // The AddCategoryModal component remains the same...
-function AddCategoryModal({ onClose, user, existingCategories }) {
+function AddCategoryModal({ onClose, user, existingCategories, isProUser }) {
   const [categoryName, setCategoryName] = useState('');
   const [categoryColor, setCategoryColor] = useState('#4ade80');
 
@@ -16,6 +16,10 @@ function AddCategoryModal({ onClose, user, existingCategories }) {
   };
 
   const handleSave = async () => {
+    if (!isProUser && existingCategories.length >= 2) {
+      alert('You need to upgrade to Pro to add more than 2 categories!');
+      return;
+    }
     if (!categoryName || !user) return;
     const newCategory = { name: categoryName, color: categoryColor };
     const updatedCategories = [...existingCategories, newCategory];
@@ -60,6 +64,8 @@ function TimerView({ user, categories }) {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [elapsedTime, setElapsedTime] = useState(0); // Our new accurate stopwatch
   const [currentPage, setCurrentPage] = useState(0);
+
+  const isProUser = false;
   
   const intervalRef = useRef(null);
 
@@ -229,6 +235,8 @@ function TimerView({ user, categories }) {
         
 
       </div>
+      {/* The Add Category Button */}
+      {isProUser || categories.length < 2 ? (
       <div className='flex justify-center mt-4'>
           <button className='flex items-center justify-center w-10 h-10 border-2 border-dashed border-gray-600 rounded-full text-gray-600 hover:border-gray-500 hover:text-gray-500 transition-colors' onClick={handleOpenModal}>
             <svg className="w-8 h-8" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
@@ -236,8 +244,13 @@ function TimerView({ user, categories }) {
             </svg>
           </button>
         </div>
-
-      {isModalOpen && <AddCategoryModal onClose={handleCloseModal} user={user} existingCategories={categories}/>}
+      ) : (
+        <div className='flex justify-center mt-4'>
+          <p className='text-gray-400'>Add more categories with Pro!</p>
+          <button className='px-3 py-1 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-500 rounded-md ml-2'>Upgrade Now</button>
+        </div>
+      )}
+      {isModalOpen && <AddCategoryModal onClose={handleCloseModal} user={user} existingCategories={categories} isProUser={isProUser}/>}
     </>
   );
 }

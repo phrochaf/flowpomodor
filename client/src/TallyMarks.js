@@ -9,15 +9,15 @@ const calculateTallys = (totalMinutes) => {
 function SingleTallyMark() {
     return (
       <svg 
-        className="w-8 h-8" 
-        viewBox="0 0 32 32" 
+        className="w-2 h-8" 
+        viewBox="0 0 8 32" 
         fill="none" 
         xmlns="http://www.w3.org/2000/svg"
         stroke="currentColor"
         strokeWidth="2"
         strokeLinecap="round"
       >
-        <line x1="16" y1="2" x2="16" y2="28" />
+        <line x1="4" y1="4" x2="4" y2="28" />
       </svg>
     );
   }
