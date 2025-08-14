@@ -1,42 +1,21 @@
 // server/server.js
 
-// 0. Import the .env file
 require('dotenv').config();
 
-// 1. Import the packages we installed
 const express = require('express');
 const cors = require('cors');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
-// 2. Create an instance of an Express application
 const app = express();
 
-// 3. Define the port the server will run on
-const PORT = 5001;
-
-
-// 4. Use the CORS middleware
-app.use(cors({
-  origin: 'http://localhost:3000',
-  credentials: true,
-}));
-
-// 4. Middleware to parse JSON bodies
 app.use(express.json());
+app.use(cors());
 
-// 5. Middleware to parse URL-encoded bodies
-app.use(express.urlencoded({ extended: true }));
+const PORT =  process.env.PORT || 5001;
 
-// 6. Define a simple test route
-// This means if someone visits http://localhost:5000/api/test,
-// we'll send back a JSON message.
+
 app.get('/api/test', (req, res) => {
   res.json({ message: 'Hello from the server!' });
-});
-
-// 7. Start the server and make it listen for requests
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
 });
 
 app.post('/create-checkout-session', async (req, res) => {
@@ -54,8 +33,8 @@ app.post('/create-checkout-session', async (req, res) => {
         quantity: 1,
       }],
       mode: 'payment',
-      success_url: 'http://localhost:3000/',
-      cancel_url: 'http://localhost:3000/',
+      success_url: `${process.env.CLIENT_URL || 'http://localhost:3000'}?payment=success`,
+      cancel_url: `${process.env.CLIENT_URL || 'http://localhost:3000'}`,
     });
     res.json({ url: session.url });
   } catch (error) {
@@ -65,7 +44,7 @@ app.post('/create-checkout-session', async (req, res) => {
   }
 });
 
-// 8. Start the server and make it listen for requests
+
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
