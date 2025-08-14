@@ -54,6 +54,32 @@ function DashboardView({ user, categories }) {
     }
   }, [user]);
 
+  const handleUpgradeClick = async () => {
+    try {
+      const response = await fetch(`${API_URL}/create-checkout-session`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userId: user.uid }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Server responded with an error');
+      }
+
+      const data = await response.json();
+      if (data.url) {
+        window.location.href = data.url;  
+      } 
+
+    } catch (error) {
+      console.error('Error upgrading to Pro:', error);
+      setError('Could not connect to the payment service. Please try again later');
+    }
+  };
+
+
   // --- Filtering Logic ---
   const filteredSessions = sessions.filter(session => {
     if (!isProUser) {
@@ -155,7 +181,7 @@ function DashboardView({ user, categories }) {
         ) : (
         <div className="flex items-center gap-4">
             <p className="text-sm text-gray-400">Filter by day, week or month with Pro!</p>
-            <button className="px-3 py-1 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-500 rounded-md">
+            <button className="px-3 py-1 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-500 rounded-md" onClick={handleUpgradeClick}>
             Upgrade Now
             </button>
         </div>
