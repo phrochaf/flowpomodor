@@ -1,9 +1,9 @@
 // client/src/TimerView.js
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { CirclePicker } from 'react-color';
-import { auth, db } from './firebase';
-import { doc, setDoc, onSnapshot, collection, addDoc } from "firebase/firestore";
+import { db } from './firebase';
+import { doc, setDoc, collection, addDoc } from "firebase/firestore";
 import TallyMarks from './TallyMarks';
 
 // The AddCategoryModal component remains the same...
@@ -93,7 +93,7 @@ function TimerView({ user, categories }) {
       clearInterval(intervalRef.current);
     }
     return () => clearInterval(intervalRef.current);
-  }, [isActive, isFlowMode, timerMode]);
+  }, [isActive, isFlowMode, timerMode, handleReset]);
 
   // --- HANDLERS ---
   const handleOpenModal = () => { setIsModalOpen(true); };
@@ -108,7 +108,7 @@ function TimerView({ user, categories }) {
   };
 
   // Your new, more accurate saveSession function
-  const saveSession = async () => {
+  const saveSession = useCallback(async () => {
     if (!user || timerMode !== 'focus' || elapsedTime < 1) {
       return;
     }
@@ -123,7 +123,7 @@ function TimerView({ user, categories }) {
     } catch (error) {
       console.error('Error saving session:', error);
     }
-  };
+  }, [user, timerMode, elapsedTime, selectedCategory]);
 
   // Your new handleStart function
   const handleStart = () => { 
@@ -136,7 +136,7 @@ function TimerView({ user, categories }) {
   };
 
   // The functions that end a work block
-  const handleReset = () => {
+  const handleReset = useCallback(() => {
     saveSession();
     setElapsedTime(0);
     setIsActive(false);
@@ -144,9 +144,9 @@ function TimerView({ user, categories }) {
     if (timerMode === 'focus') { setTime(25*60); } 
     else if (timerMode === 'shortBreak') { setTime(5 * 60); } 
     else if (timerMode === 'longBreak') { setTime(15 * 60); }
-  };
+  }, [timerMode, saveSession]);
   
-  const switchMode = (mode) => {
+  const switchMode = useCallback((mode) => {
     saveSession();
     setElapsedTime(0);
     setIsActive(false);
@@ -155,7 +155,7 @@ function TimerView({ user, categories }) {
     if (mode === 'focus') { setTime(25*60); } 
     else if (mode === 'shortBreak') { setTime(5 * 60); } 
     else if (mode === 'longBreak') { setTime(15 * 60); }
-  };
+  }, [saveSession]);
 
   const handleNextPage = () => {
     const totalPages = Math.ceil(categories.length/3);
