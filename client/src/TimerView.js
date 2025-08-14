@@ -68,33 +68,6 @@ function TimerView({ user, categories }) {
   const isProUser = false;
   
   const intervalRef = useRef(null);
-
-  // --- EFFECTS ---
-  // Effect for the timer logic
-  useEffect(() => {
-    if (isActive) {
-      intervalRef.current = setInterval(() => {
-        // We only track elapsed time during a focus session.
-        if (timerMode === 'focus') {
-          setElapsedTime(prev => prev + 1);
-        }
-
-        setTime(prevTime => {
-          if (isFlowMode) { return prevTime + 1; }
-          if (prevTime === 1) {
-            if (timerMode === 'focus') { setIsFlowMode(true); } 
-            else { handleReset(); }
-            return 0;
-          }
-          return prevTime - 1;
-        });
-      }, 1000);
-    } else {
-      clearInterval(intervalRef.current);
-    }
-    return () => clearInterval(intervalRef.current);
-  }, [isActive, isFlowMode, timerMode, handleReset]);
-
   // --- HANDLERS ---
   const handleOpenModal = () => { setIsModalOpen(true); };
   const handleCloseModal = () => { setIsModalOpen(false); };
@@ -169,6 +142,34 @@ function TimerView({ user, categories }) {
       setCurrentPage(prev => prev - 1);
     }
   }
+  
+  // --- EFFECTS ---
+  // Effect for the timer logic
+  useEffect(() => {
+    if (isActive) {
+      intervalRef.current = setInterval(() => {
+        // We only track elapsed time during a focus session.
+        if (timerMode === 'focus') {
+          setElapsedTime(prev => prev + 1);
+        }
+
+        setTime(prevTime => {
+          if (isFlowMode) { return prevTime + 1; }
+          if (prevTime === 1) {
+            if (timerMode === 'focus') { setIsFlowMode(true); } 
+            else { handleReset(); }
+            return 0;
+          }
+          return prevTime - 1;
+        });
+      }, 1000);
+    } else {
+      clearInterval(intervalRef.current);
+    }
+    return () => clearInterval(intervalRef.current);
+  }, [isActive, isFlowMode, timerMode, handleReset]);
+
+
 
   const categoriesToShow = categories.slice(currentPage * 3, (currentPage + 1) * 3);
   
