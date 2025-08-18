@@ -6,7 +6,7 @@ import { collection, query, where, onSnapshot } from "firebase/firestore";
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
 import { API_URL } from './apiConfig';
 
-function DashboardView({ user, categories }) {
+function DashboardView({ user, categories, isProUser }) {
   const [sessions, setSessions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -16,7 +16,6 @@ function DashboardView({ user, categories }) {
 
   // Ensure categories is always an array
   const safeCategories = Array.isArray(categories) ? categories : [];
-  const isProUser = false;
 
   useEffect(() => {
     if (!user) {

@@ -54,7 +54,7 @@ function AddCategoryModal({ onClose, user, existingCategories, isProUser }) {
 }
 
 
-function TimerView({ user, categories }) {
+function TimerView({ user, categories, isProUser }) {
   // --- STATE ---
   const [timerMode, setTimerMode] = useState('focus'); 
   const [time, setTime] = useState(25 * 60);
@@ -64,8 +64,6 @@ function TimerView({ user, categories }) {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [elapsedTime, setElapsedTime] = useState(0); // Our new accurate stopwatch
   const [currentPage, setCurrentPage] = useState(0);
-
-  const isProUser = false;
   
   const intervalRef = useRef(null);
   // --- HANDLERS ---
@@ -142,7 +140,7 @@ function TimerView({ user, categories }) {
       setCurrentPage(prev => prev - 1);
     }
   }
-  
+
   // --- EFFECTS ---
   // Effect for the timer logic
   useEffect(() => {

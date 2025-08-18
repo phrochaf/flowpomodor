@@ -54,6 +54,8 @@ function App() {
   const [categories, setCategories] = useState([]);
   const [error, setError] = useState(null);
 
+  const isProUser = false;
+
   // Your corrected useEffect listener!
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -155,9 +157,9 @@ function App() {
         />
         
         <main className='w-full'>
-          {view === 'timer' && <TimerView user={user} categories={categories} />} 
-          {view === 'dashboard' && <DashboardView user={user} categories={categories} />}
-          {view === 'settings' && <SettingsView user={user} categories={categories} />}
+          {view === 'timer' && <TimerView user={user} categories={categories} isProUser={isProUser} />} 
+          {view === 'dashboard' && <DashboardView user={user} categories={categories} isProUser={isProUser} />}
+          {view === 'settings' && <SettingsView user={user} categories={categories} isProUser={isProUser} />}
           {/* We'll add the other views later */}
         </main>
       </div>
