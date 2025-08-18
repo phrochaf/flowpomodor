@@ -10,7 +10,6 @@ function DashboardView({ user, categories, isProUser }) {
   const [sessions, setSessions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  // Your new state variables!
   const [chartType, setChartType] = useState('pie');
   const [timeFilter, setTimeFilter] = useState('all');
 
@@ -76,6 +75,16 @@ function DashboardView({ user, categories, isProUser }) {
     } catch (error) {
       console.error('Error upgrading to Pro:', error);
       setError('Could not connect to the payment service. Please try again later');
+    }
+  };
+
+  const handleDeleteSession = async (sessionId) => {
+    try {
+      await deleteDoc(doc(db, 'sessions', sessionId));
+      setSessions(prevSessions => prevSessions.filter(session => session.id !== sessionId));
+    } catch (error) {
+      console.error('Error deleting session:', error);
+      setError('Failed to delete session');
     }
   };
 
@@ -227,6 +236,11 @@ function DashboardView({ user, categories, isProUser }) {
                     <p className="text-sm text-gray-400">{new Date(session.timestamp).toLocaleString()}</p>
                   </div>
                   <span className="text-lg font-semibold text-green-400">{formatDuration(session.duration)}</span>
+                  <button className="text-red-400 hover:text-red-500" onClick={() => handleDeleteSession(session.id)}>
+                    <svg className="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.134-2.033-2.134H8.716c-1.123 0-2.033.954-2.033 2.134v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                    </svg>
+                  </button>
                 </li>
               ))}
             </ul>
