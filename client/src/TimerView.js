@@ -5,6 +5,7 @@ import { CirclePicker } from 'react-color';
 import { db } from './firebase';
 import { doc, setDoc, collection, addDoc } from "firebase/firestore";
 import TallyMarks from './TallyMarks';
+import { API_URL } from './apiConfig';
 
 // The AddCategoryModal component remains the same...
 function AddCategoryModal({ onClose, user, existingCategories, isProUser }) {
@@ -64,7 +65,7 @@ function TimerView({ user, categories, isProUser }) {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [elapsedTime, setElapsedTime] = useState(0); // Our new accurate stopwatch
   const [currentPage, setCurrentPage] = useState(0);
-  
+  const [isUpgrading, setIsUpgrading] = useState(false);
   const intervalRef = useRef(null);
   // --- HANDLERS ---
   const handleOpenModal = () => { setIsModalOpen(true); };
@@ -140,6 +141,35 @@ function TimerView({ user, categories, isProUser }) {
       setCurrentPage(prev => prev - 1);
     }
   }
+
+  const handleUpgradeClick = async () => {
+    try {
+      setIsUpgrading(true);
+      const response = await fetch(`${API_URL}/create-checkout-session`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userId: user.uid }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Server responded with an error');
+      }
+
+      const data = await response.json();
+      if (data.url) {
+        window.location.href = data.url;  
+      } 
+
+    } catch (error) {
+      console.error('Error upgrading to Pro:', error);
+      setError('Could not connect to the payment service. Please try again later');
+    
+    } finally {
+      setIsUpgrading(false);
+    }
+  };
 
   // --- EFFECTS ---
   // Effect for the timer logic
@@ -246,7 +276,9 @@ function TimerView({ user, categories, isProUser }) {
       ) : (
         <div className='flex justify-center mt-4'>
           <p className='text-gray-400'>Add more categories with Pro!</p>
-          <button className='px-3 py-1 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-500 rounded-md ml-2'>Upgrade Now</button>
+          <button className='px-3 py-1 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-500 rounded-md ml-2' onClick={handleUpgradeClick} disabled={isUpgrading}>
+            {isUpgrading ? 'Processing...' : 'Upgrade Now'}
+          </button>
         </div>
       )}
       {isModalOpen && <AddCategoryModal onClose={handleCloseModal} user={user} existingCategories={categories} isProUser={isProUser}/>}
