@@ -12,6 +12,7 @@ function DashboardView({ user, categories, isProUser }) {
   const [error, setError] = useState(null);
   const [chartType, setChartType] = useState('pie');
   const [timeFilter, setTimeFilter] = useState('all');
+  const [isUpgrading, setIsUpgrading] = useState(false);
 
   // Ensure categories is always an array
   const safeCategories = Array.isArray(categories) ? categories : [];
@@ -55,6 +56,7 @@ function DashboardView({ user, categories, isProUser }) {
 
   const handleUpgradeClick = async () => {
     try {
+      setIsUpgrading(true);
       const response = await fetch(`${API_URL}/create-checkout-session`, {
         method: 'POST',
         headers: {
@@ -75,6 +77,9 @@ function DashboardView({ user, categories, isProUser }) {
     } catch (error) {
       console.error('Error upgrading to Pro:', error);
       setError('Could not connect to the payment service. Please try again later');
+    
+    } finally {
+      setIsUpgrading(false);
     }
   };
 
@@ -193,8 +198,8 @@ function DashboardView({ user, categories, isProUser }) {
         ) : (
         <div className="flex items-center gap-4">
             <p className="text-sm text-gray-400">Filter by day, week or month with Pro!</p>
-            <button className="px-3 py-1 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-500 rounded-md" onClick={handleUpgradeClick}>
-            Upgrade Now
+            <button className="px-3 py-1 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-500 rounded-md" onClick={handleUpgradeClick} disabled={isUpgrading}>
+            {isUpgrading ? 'Processing...' : 'Upgrade Now'}
             </button>
         </div>
         )}
