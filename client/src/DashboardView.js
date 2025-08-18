@@ -79,6 +79,9 @@ function DashboardView({ user, categories, isProUser }) {
   };
 
   const handleDeleteSession = async (sessionId) => {
+    console.log("Delete button clicked!");
+    console.log("Attempting to delete session with ID:", sessionId);
+    
     try {
       await deleteDoc(doc(db, 'sessions', sessionId));
       setSessions(prevSessions => prevSessions.filter(session => session.id !== sessionId));
