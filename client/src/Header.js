@@ -35,7 +35,7 @@ function Header({ user, setView, onLogin, onLogout }) {
             className='px-4 py-2 rounded-md text-sm font-bold text-white bg-blue-600 hover:bg-blue-500 transition-colors' 
             onClick={onLogin}
           >
-            Login with Google
+            Login
           </button>
         )}
       </div>
