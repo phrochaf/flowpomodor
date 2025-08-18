@@ -66,6 +66,7 @@ function TimerView({ user, categories, isProUser }) {
   const [elapsedTime, setElapsedTime] = useState(0); // Our new accurate stopwatch
   const [currentPage, setCurrentPage] = useState(0);
   const [isUpgrading, setIsUpgrading] = useState(false);
+  const [error, setError] = useState(null);
   const intervalRef = useRef(null);
   // --- HANDLERS ---
   const handleOpenModal = () => { setIsModalOpen(true); };
@@ -282,6 +283,7 @@ function TimerView({ user, categories, isProUser }) {
         </div>
       )}
       {isModalOpen && <AddCategoryModal onClose={handleCloseModal} user={user} existingCategories={categories} isProUser={isProUser}/>}
+      {error && <div className="text-red-500 text-center mt-4">{error}</div>}
     </>
   );
 }
